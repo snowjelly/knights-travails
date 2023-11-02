@@ -28,4 +28,23 @@ const createNodes = () => {
   return arr;
 };
 
-console.log(createNodes());
+function knightMoves(start, destination) {
+  // knight can move 2 steps forward and one to the side
+  // as long as x && y > 0
+  const potentialMoves = [];
+  const x = start[0];
+  const y = start[1];
+
+  potentialMoves.push([x + 2, y + 1]);
+  potentialMoves.push([x - 2, y - 1]);
+  potentialMoves.push([x + 2, y - 1]);
+  potentialMoves.push([x - 2, y + 1]);
+  //x + 2 || x - 2;
+  // y + 1 || y - 1;
+  // or
+  y + 2 || y - 2;
+  x + 1 || x - 1;
+  console.log(potentialMoves);
+}
+
+console.log(knightMoves([0, 0], [3, 3]));
