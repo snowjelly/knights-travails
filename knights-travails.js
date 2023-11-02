@@ -1,17 +1,12 @@
 const node = (x, y) => {
   return {
     data: [x, y],
-    left: null,
-    right: null,
-    bottom: null,
-    top: null,
     knight: false,
   };
 };
 
 const createNodes = () => {
   const arr = [];
-  let tmp;
   for (let i = 0; i <= 7; i++) {
     for (let y = 0; y <= 7; y++) {
       const nodeOb = node(i, y);
@@ -30,7 +25,7 @@ const createNodes = () => {
       arr.push(nodeOb);
     }
   }
-  console.log(arr);
+  return arr;
 };
 
 console.log(createNodes());
