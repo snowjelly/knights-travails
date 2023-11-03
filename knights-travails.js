@@ -36,15 +36,19 @@ function knightMoves(start, destination) {
   const y = start[1];
 
   potentialMoves.push([x + 2, y + 1]);
-  potentialMoves.push([x - 2, y - 1]);
   potentialMoves.push([x + 2, y - 1]);
+  potentialMoves.push([x - 2, y - 1]);
   potentialMoves.push([x - 2, y + 1]);
-  //x + 2 || x - 2;
-  // y + 1 || y - 1;
-  // or
-  y + 2 || y - 2;
-  x + 1 || x - 1;
-  console.log(potentialMoves);
+
+  potentialMoves.push([x + 1, y + 2]);
+  potentialMoves.push([x - 1, y + 2]);
+  potentialMoves.push([x - 1, y - 2]);
+  potentialMoves.push([x + 1, y - 2]);
+
+  const legalMoves = potentialMoves.filter(
+    (move) => move[0] > 0 && move[1] > 0
+  );
+  console.log(legalMoves);
 }
 
-console.log(knightMoves([0, 0], [3, 3]));
+console.log(knightMoves([3, 3], [3, 3]));
