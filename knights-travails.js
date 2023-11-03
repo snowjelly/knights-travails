@@ -1,54 +1,55 @@
 const node = (x, y) => {
+  function potentialMoves(x, y) {
+    const arr = [];
+
+    arr.push([x + 2, y + 1]);
+    arr.push([x + 2, y - 1]);
+    arr.push([x - 2, y - 1]);
+    arr.push([x - 2, y + 1]);
+
+    arr.push([x + 1, y + 2]);
+    arr.push([x - 1, y + 2]);
+    arr.push([x - 1, y - 2]);
+    arr.push([x + 1, y - 2]);
+    const legalMoves = arr.filter((move) => move[0] > 0 && move[1] > 0);
+
+    return legalMoves;
+  }
+
   return {
     data: [x, y],
     knight: false,
+    potentialMoves: potentialMoves(x, y),
   };
 };
 
-const createNodes = () => {
-  const arr = [];
-  for (let i = 0; i <= 7; i++) {
-    for (let y = 0; y <= 7; y++) {
-      const nodeOb = node(i, y);
-      if (i !== 0) {
-        nodeOb.left = node(i - 1, y);
-      }
-      if (i !== 7) {
-        nodeOb.right = node(i + 1, y);
-      }
-      if (y !== 0) {
-        nodeOb.bottom = node(i, y - 1);
-      }
-      if (y !== 7) {
-        nodeOb.top = node(i, y + 1);
-      }
-      arr.push(nodeOb);
-    }
-  }
-  return arr;
-};
+function buildTree(arr, root) {
+  let l = 0;
+  let h = arr.length - 1;
+  let mid = Math.floor((l + h) / 2);
+
+  console.log(arr[mid], root);
+}
 
 function knightMoves(start, destination) {
   // knight can move 2 steps forward and one to the side
   // as long as x && y > 0
-  const potentialMoves = [];
-  const x = start[0];
-  const y = start[1];
+  const startX = start[0];
+  const startY = start[1];
+  const goalX = destination[0];
+  const goalY = destination[1];
 
-  potentialMoves.push([x + 2, y + 1]);
-  potentialMoves.push([x + 2, y - 1]);
-  potentialMoves.push([x - 2, y - 1]);
-  potentialMoves.push([x - 2, y + 1]);
+  // order potential moves
+  // mid = destination
+  // potentialMoveX < destinationX go to left
+  // potentialMoveX > destinationX go to right
+  // if potentialMoveX === destinationX,
+  // check if <(left) or >(right) destinationY
+  //
+  const startNode = node(startX, startY);
+  const destinationNode = node(goalX, goalY);
 
-  potentialMoves.push([x + 1, y + 2]);
-  potentialMoves.push([x - 1, y + 2]);
-  potentialMoves.push([x - 1, y - 2]);
-  potentialMoves.push([x + 1, y - 2]);
-
-  const legalMoves = potentialMoves.filter(
-    (move) => move[0] > 0 && move[1] > 0
-  );
-  console.log(legalMoves);
+  console.log(buildTree(startNode.potentialMoves, destinationNode.data));
 }
 
-console.log(knightMoves([3, 3], [3, 3]));
+console.log(knightMoves([3, 3], [4, 5]));
