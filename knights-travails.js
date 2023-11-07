@@ -52,7 +52,18 @@ function gameBoard() {
     }
     return arr;
   }
-  return create();
+
+  const board = create();
+
+  function createPotentialMoves() {
+    const boardsPotentialMoves = [];
+    board.forEach((space) => {
+      boardsPotentialMoves.push(node(space[0], space[1]));
+    });
+    return boardsPotentialMoves;
+  }
+
+  return { board, potentialMoves: createPotentialMoves() };
 }
 
 const prettyPrint = (node, prefix = "", isLeft = true) => {
@@ -79,7 +90,7 @@ const prettyPrintAlt = (node, prefix = "", isLeft = true) => {
   if (node.right !== null) {
     prettyPrintAlt(node.right, `${prefix}${isLeft ? "│   " : "    "}`, false);
   }
-  console.log(`${prefix}${isLeft ? "└── " : "┌── "} [${node.data[0]}]`);
+  console.log(`${prefix}${isLeft ? "└── " : "┌── "}[${node.data[0]}]`);
   if (node.left !== null) {
     prettyPrintAlt(node.left, `${prefix}${isLeft ? "    " : "│   "}`, true);
   }
@@ -119,26 +130,37 @@ function knightMoves(startArr, endArr = []) {
   const endX = endArr[0];
   const endY = endArr[1];
 
-  return [startX, startY];
+  return { start: [startX, startY], end: [endX, endY] };
 }
 
-const board = gameBoard();
-const boardsPotentialMoves = [];
-
-board.forEach((space) => {
-  boardsPotentialMoves.push(node(space[0], space[1]));
-});
+const board = gameBoard().board;
+const boardsPotentialMoves = gameBoard().potentialMoves;
 
 const treeList = [];
 
-const knight = knightMoves([3, 3]);
+const knight = knightMoves([3, 3], [0, 0]);
 
-boardsPotentialMoves.forEach((space) => {
-  const spaceX = space.data[0];
-  const spaceY = space.data[1];
+const knightTree = boardsPotentialMoves.find(
+  (space) =>
+    space.data[0] === knight.start[0] && space.data[1] === knight.start[1]
+);
 
-  if (spaceX === knight[0] && spaceY === knight[1]) {
-    console.log(space);
-    prettyPrintAlt(space.potentialMoves);
-  }
-});
+console.log(knightTree);
+
+prettyPrintAlt(knightTree.potentialMoves);
+
+// const spaceX = space.data[0];
+// const spaceY = space.data[1];
+
+// if (spaceX === knight[0] && spaceY === knight[1]) {
+//   console.log(space);
+//   prettyPrintAlt(space.potentialMoves);
+//   levelOrderRecursive(
+//     (result) => {
+//       result.potentialMoves = node(result.data[0][0], result.data[0][1]);
+//       console.log(result.data[0]);
+//       prettyPrintAlt(result.potentialMoves.potentialMoves);
+//     },
+//     [space.potentialMoves]
+//   );
+// }
