@@ -89,9 +89,8 @@ function find(value, rootNode) {
       break;
     }
   }
-
-  if (x === rootNode.data[0] && y === rootNode.data[1]) {
-    return { rootNode, found: true };
+  if (rootNode.left === null && rootNode.right === null) {
+    return { rootNode, done: true };
   }
 
   return rootNode;
@@ -124,22 +123,98 @@ function knightMoves(start, destination) {
   prettyPrint(rootNode);
 
   function move(rootNode) {
-    let n = find(destinationNode.data, rootNode);
-    if (n.found) {
-      console.log("found");
-      console.log(n.rootNode);
+    rootNode = buildTree(
+      0,
+      rootNode.potentialMoves.length - 1,
+      rootNode.potentialMoves
+    );
+    return rootNode;
+  }
+
+  //okay my idea is like
+  // check kinght possible moves
+  // go through each one
+  // check destination possible moves
+  // if they share a move. go there.
+  // if not pick the one
+
+  // nah maybe not ^
+
+  // maybe what i do..
+  // depth first search
+  // increment or decrement values until close
+  // then decrement
+
+  function levelOrderRecursive(
+    cb = null,
+    queue = [rootNode],
+    orderedArray = []
+  ) {
+    if (queue.length === 0 && cb === null) {
+      return orderedArray;
+    }
+    if (queue.length === 0) {
       return;
     }
 
-    // console.log({ n: n.potentialMoves });
+    const deQueue = queue.shift();
+    if (cb !== null) {
+      cb(deQueue);
+    }
 
-    rootNode = buildTree(0, n.potentialMoves.length - 1, n.potentialMoves);
-    console.log(n);
+    if (deQueue.left !== null) {
+      queue = [...queue, deQueue.left];
+    }
+    if (deQueue.right !== null) {
+      queue = [...queue, deQueue.right];
+    }
 
-    move(rootNode);
+    if (cb !== null) {
+      levelOrderRecursive(cb, queue);
+    } else {
+      orderedArray = levelOrderRecursive(cb, queue, [...orderedArray, deQueue]);
+      return orderedArray;
+    }
   }
 
-  console.log(move(rootNode));
+  // cant backtrack
+
+  function doStuff(rootN = rootNode) {
+    levelOrderRecursive(
+      (potentialMovesFromStart) => {
+        const tree = move(potentialMovesFromStart);
+        prettyPrint(tree);
+        levelOrderRecursive(
+          (potentialMoves) => {
+            console.log({ potentialMoves });
+            const searchForDestination = find(rootNode.data, potentialMoves);
+            console.log(searchForDestination.rootNode);
+
+            // if (
+            //   searchForDestination.rootNode.data[0] === rootNode.data[0] &&
+            //   searchForDestination.rootNode.data[1] === rootNode.data[1]
+            // ) {
+            //   console.log("found it!");
+            // }
+
+            // console.log({
+            //   searchX: searchForDestination.rootNode.data[0],
+            //   seachY: searchForDestination.rootNode.data[1],
+            //   nodeX: rootNode.data[0],
+            //   nodeY: rootNode.data[1],
+            // });
+
+            doStuff(move(potentialMoves));
+          },
+          [tree.right]
+        );
+      },
+      [rootN]
+    );
+  }
+
+  doStuff();
+  //console.log(move(rootNode));
 
   // console.log(startNode.potentialMoves);
   // const testX = startNode.potentialMoves[1][0];
@@ -170,4 +245,4 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
   }
 };
 
-console.log(knightMoves([0, 0], [7, 7]));
+console.log(knightMoves([0, 0], [6, 6]));
