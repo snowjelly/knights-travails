@@ -58,6 +58,7 @@ function gameBoard() {
   function createPotentialMoves() {
     const boardsPotentialMoves = [];
     board.forEach((space) => {
+      console.log(space);
       boardsPotentialMoves.push(node(space[0], space[1]));
     });
     return boardsPotentialMoves;
@@ -133,34 +134,19 @@ function knightMoves(startArr, endArr = []) {
   return { start: [startX, startY], end: [endX, endY] };
 }
 
-const board = gameBoard().board;
-const boardsPotentialMoves = gameBoard().potentialMoves;
+function driver() {
+  const boardsPotentialMoves = gameBoard().potentialMoves;
 
-const treeList = [];
+  const knight = knightMoves([3, 3], [0, 0]);
 
-const knight = knightMoves([3, 3], [0, 0]);
+  const knightTree = boardsPotentialMoves.find(
+    (space) =>
+      space.data[0] === knight.start[0] && space.data[1] === knight.start[1]
+  );
 
-const knightTree = boardsPotentialMoves.find(
-  (space) =>
-    space.data[0] === knight.start[0] && space.data[1] === knight.start[1]
-);
+  console.log(knightTree);
 
-console.log(knightTree);
+  prettyPrintAlt(knightTree.potentialMoves);
+}
 
-prettyPrintAlt(knightTree.potentialMoves);
-
-// const spaceX = space.data[0];
-// const spaceY = space.data[1];
-
-// if (spaceX === knight[0] && spaceY === knight[1]) {
-//   console.log(space);
-//   prettyPrintAlt(space.potentialMoves);
-//   levelOrderRecursive(
-//     (result) => {
-//       result.potentialMoves = node(result.data[0][0], result.data[0][1]);
-//       console.log(result.data[0]);
-//       prettyPrintAlt(result.potentialMoves.potentialMoves);
-//     },
-//     [space.potentialMoves]
-//   );
-// }
+driver();
