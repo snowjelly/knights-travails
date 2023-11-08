@@ -1,3 +1,31 @@
+function levelOrderRecursive(cb = null, queue = [root], orderedArray = []) {
+  if (queue.length === 0 && cb === null) {
+    return orderedArray;
+  }
+  if (queue.length === 0) {
+    return;
+  }
+
+  const deQueue = queue.shift();
+  if (cb !== null) {
+    cb(deQueue);
+  }
+
+  if (deQueue.left !== null) {
+    queue = [...queue, deQueue.left];
+  }
+  if (deQueue.right !== null) {
+    queue = [...queue, deQueue.right];
+  }
+
+  if (cb !== null) {
+    levelOrderRecursive(cb, queue);
+  } else {
+    orderedArray = levelOrderRecursive(cb, queue, [...orderedArray, deQueue]);
+    return orderedArray;
+  }
+}
+
 const node = (x, y) => {
   function getPotentialMoves(x, y) {
     const arr = [];
@@ -58,7 +86,6 @@ function gameBoard() {
   function createPotentialMoves() {
     const boardsPotentialMoves = [];
     board.forEach((space) => {
-      console.log(space);
       boardsPotentialMoves.push(node(space[0], space[1]));
     });
     return boardsPotentialMoves;
@@ -97,34 +124,6 @@ const prettyPrintAlt = (node, prefix = "", isLeft = true) => {
   }
 };
 
-function levelOrderRecursive(cb = null, queue = [root], orderedArray = []) {
-  if (queue.length === 0 && cb === null) {
-    return orderedArray;
-  }
-  if (queue.length === 0) {
-    return;
-  }
-
-  const deQueue = queue.shift();
-  if (cb !== null) {
-    cb(deQueue);
-  }
-
-  if (deQueue.left !== null) {
-    queue = [...queue, deQueue.left];
-  }
-  if (deQueue.right !== null) {
-    queue = [...queue, deQueue.right];
-  }
-
-  if (cb !== null) {
-    levelOrderRecursive(cb, queue);
-  } else {
-    orderedArray = levelOrderRecursive(cb, queue, [...orderedArray, deQueue]);
-    return orderedArray;
-  }
-}
-
 function knightMoves(startArr, endArr = []) {
   const startX = startArr[0];
   const startY = startArr[1];
@@ -134,19 +133,38 @@ function knightMoves(startArr, endArr = []) {
   return { start: [startX, startY], end: [endX, endY] };
 }
 
+function recurse(startingNode) {
+  const arr = levelOrderRecursive(null, [startingNode.potentialMoves]);
+  for (let i = 0; i < arr.length; i++) {
+    console.log({ startingNodeData: startingNode.data });
+    arr[i].potentialMoves = node(arr[i].data[0][0], arr[i].data[0][1]);
+    //console.log(arr[i].data[0]);
+    prettyPrintAlt(arr[i].potentialMoves.potentialMoves);
+    console.log(arr[i].potentialMoves.potentialMoves.data[0]);
+    if (
+      arr[i].potentialMoves.potentialMoves.data[0][0] ===
+        startingNode.data[0] &&
+      arr[i].potentialMoves.potentialMoves.data[0][1] === startingNode.data[1]
+    ) {
+      throw new Error("pls return :/");
+    }
+    recurse(arr[i].potentialMoves);
+  }
+}
+
 function driver() {
   const boardsPotentialMoves = gameBoard().potentialMoves;
 
-  const knight = knightMoves([3, 3], [0, 0]);
+  const knight = knightMoves([7, 7], [0, 0]);
 
   const knightTree = boardsPotentialMoves.find(
     (space) =>
       space.data[0] === knight.start[0] && space.data[1] === knight.start[1]
   );
 
-  console.log(knightTree);
-
   prettyPrintAlt(knightTree.potentialMoves);
+
+  recurse(knightTree);
 }
 
 driver();
