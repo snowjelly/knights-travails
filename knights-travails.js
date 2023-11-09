@@ -149,15 +149,18 @@ function knightMoves(startArr, endArr) {
       },
       [nodeNTree]
     );
-    if (found) {
-    }
   }
 
-  console.log(
-    moveSequences[1].forEach((value) => {
-      console.log(value.currentSpace);
-    })
-  );
+  const sortedSeq = moveSequences.sort((a, b) => {
+    return a.length - b.length;
+  });
+
+  moveList.push(startArr);
+  sortedSeq[0].forEach((value) => {
+    moveList.push(value.currentSpace);
+  });
+
+  console.log(moveList);
 
   // const trees = buildingTrees(startNode);
   // return trees;
