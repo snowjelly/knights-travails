@@ -26,8 +26,19 @@ function levelOrderRecursive(cb = null, queue = [root], orderedArray = []) {
   }
 }
 
-const node = (x, y) => {
-  function getPotentialMoves(x, y) {
+function buildTree(l, h, sortedArr) {
+  if (l > h) return null;
+
+  const mid = Math.floor((l + h) / 2);
+  const nodeOb = node(sortedArr[mid]);
+
+  nodeOb.left = buildTree(l, mid - 1, sortedArr);
+  nodeOb.right = buildTree(mid + 1, h, sortedArr);
+  return nodeOb;
+}
+
+const node = (arr) => {
+  function getPotentialMoves(x = arr[0], y = arr[1]) {
     const arr = [];
 
     arr.push([x + 2, y + 1]);
@@ -51,24 +62,15 @@ const node = (x, y) => {
     return legalMoves;
   }
 
-  function buildTree(l, h, sortedArr) {
-    if (l > h) return null;
-
-    const mid = Math.floor((l + h) / 2);
-    const nodeOb = node(sortedArr[mid]);
-
-    nodeOb.left = buildTree(l, mid - 1, sortedArr);
-    nodeOb.right = buildTree(mid + 1, h, sortedArr);
-    return nodeOb;
-  }
-
-  const potentialMoves = getPotentialMoves(x, y);
+  const potentialMoves = getPotentialMoves();
 
   return {
-    data: [x, y],
-    potentialMoves: buildTree(0, potentialMoves.length - 1, potentialMoves),
+    currentSpace: [arr[0], arr[1]],
+    potentialMoves,
   };
 };
+
+console.log(node([0, 0]));
 
 function gameBoard() {
   function create(n = 7) {
@@ -86,43 +88,13 @@ function gameBoard() {
   function createPotentialMoves() {
     const boardsPotentialMoves = [];
     board.forEach((space) => {
-      boardsPotentialMoves.push(node(space[0], space[1]));
+      boardsPotentialMoves.push(node(space));
     });
     return boardsPotentialMoves;
   }
 
   return { board, potentialMoves: createPotentialMoves() };
 }
-
-const prettyPrint = (node, prefix = "", isLeft = true) => {
-  if (node === null) {
-    return;
-  }
-  if (node.right !== null) {
-    prettyPrint(node.right, `${prefix}${isLeft ? "│   " : "    "}`, false);
-  }
-  console.log(
-    `${prefix}${isLeft ? "└── " : "┌── "}node: [${
-      node.data[0].data
-    }] pMoves: [${node.data[0].potentialMoves}]`
-  );
-  if (node.left !== null) {
-    prettyPrint(node.left, `${prefix}${isLeft ? "    " : "│   "}`, true);
-  }
-};
-
-const prettyPrintAlt = (node, prefix = "", isLeft = true) => {
-  if (node === null) {
-    return;
-  }
-  if (node.right !== null) {
-    prettyPrintAlt(node.right, `${prefix}${isLeft ? "│   " : "    "}`, false);
-  }
-  console.log(`${prefix}${isLeft ? "└── " : "┌── "}[${node.data[0]}]`);
-  if (node.left !== null) {
-    prettyPrintAlt(node.left, `${prefix}${isLeft ? "    " : "│   "}`, true);
-  }
-};
 
 function knightMoves(startArr, endArr = []) {
   const startX = startArr[0];
@@ -132,54 +104,3 @@ function knightMoves(startArr, endArr = []) {
 
   return { start: [startX, startY], end: [endX, endY] };
 }
-
-function findDupes(arrToSearch, sourceArr) {
-  const dupes = arrToSearch.every(
-    (value) => value[0] !== sourceArr[0] && value[1] !== sourceArr[1]
-  );
-  if (dupes) {
-    console.log({ dupes: false, arrToSearch });
-  } else {
-    console.log({ dupes: true, arrToSearch });
-  }
-  return !dupes;
-}
-
-function recurse(startingNode, arrToSearch = []) {
-  const arr = levelOrderRecursive(null, [startingNode.potentialMoves]);
-  for (let i = 0; i < arr.length; i++) {
-    console.log({ startingNodeData: startingNode.data });
-    arr[i].potentialMoves = node(arr[i].data[0][0], arr[i].data[0][1]);
-    //console.log(arr[i].data[0]);
-    prettyPrintAlt(arr[i].potentialMoves.potentialMoves);
-    console.log(arr[i].potentialMoves.potentialMoves.data[0]);
-    findDupes(arrToSearch, arr[i].potentialMoves.potentialMoves.data[0]);
-
-    arrToSearch.push(arr[i].potentialMoves.potentialMoves.data[0]);
-    if (
-      arr[i].potentialMoves.potentialMoves.data[0][0] ===
-        startingNode.data[0] &&
-      arr[i].potentialMoves.potentialMoves.data[0][1] === startingNode.data[1]
-    ) {
-      throw new Error("pls return :/");
-    }
-    recurse(arr[i].potentialMoves, arrToSearch);
-  }
-}
-
-function driver() {
-  const boardsPotentialMoves = gameBoard().potentialMoves;
-
-  const knight = knightMoves([7, 7], [0, 0]);
-
-  const knightTree = boardsPotentialMoves.find(
-    (space) =>
-      space.data[0] === knight.start[0] && space.data[1] === knight.start[1]
-  );
-
-  prettyPrintAlt(knightTree.potentialMoves);
-
-  recurse(knightTree);
-}
-
-driver();
