@@ -154,10 +154,12 @@ function knightMoves(startArr, endArr) {
     return a.length - b.length;
   });
 
-  moveList.push(startArr);
-  sortedSeq[0].forEach((value) => {
-    moveList.push(value.currentSpace);
-  });
+  function buildMoveList() {
+    moveList.push(startArr);
+    sortedSeq[0].forEach((value) => {
+      moveList.push(value.currentSpace);
+    });
+  }
 
   function printResults() {
     let str = `You made it in ${moveList.length - 1} moves! Here's your path:`;
@@ -167,7 +169,7 @@ function knightMoves(startArr, endArr) {
     return str;
   }
 
-  return printResults();
+  return;
 }
 
-console.log(knightMoves([0, 0], [3, 3]));
+console.log(knightMoves([0, 0], [3, 4]));
