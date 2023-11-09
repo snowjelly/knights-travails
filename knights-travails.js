@@ -8,7 +8,7 @@ function levelOrderRecursive(cb = null, queue = [root], orderedArray = []) {
 
   const deQueue = queue.shift();
   if (cb !== null) {
-    cb(deQueue);
+    if (cb(deQueue)) return true;
   }
 
   if (deQueue.left !== null) {
@@ -25,6 +25,19 @@ function levelOrderRecursive(cb = null, queue = [root], orderedArray = []) {
     return orderedArray;
   }
 }
+
+const prettyPrintAlt = (node, prefix = "", isLeft = true) => {
+  if (node === null) {
+    return;
+  }
+  if (node.right !== null) {
+    prettyPrintAlt(node.right, `${prefix}${isLeft ? "│   " : "    "}`, false);
+  }
+  console.log(`${prefix}${isLeft ? "└── " : "┌── "}[${node.data[0]}]`);
+  if (node.left !== null) {
+    prettyPrintAlt(node.left, `${prefix}${isLeft ? "    " : "│   "}`, true);
+  }
+};
 
 function buildTree(l, h, sortedArr) {
   if (l > h) return null;
@@ -70,8 +83,6 @@ const node = (arr) => {
   };
 };
 
-console.log(node([0, 0]));
-
 function gameBoard() {
   function create(n = 7) {
     const arr = [];
@@ -96,11 +107,60 @@ function gameBoard() {
   return { board, potentialMoves: createPotentialMoves() };
 }
 
-function knightMoves(startArr, endArr = []) {
-  const startX = startArr[0];
-  const startY = startArr[1];
-  const endX = endArr[0];
-  const endY = endArr[1];
+function knightMoves(startArr, endArr) {
+  const startNode = node(startArr);
 
-  return { start: [startX, startY], end: [endX, endY] };
+  function buildingTrees(node) {
+    const tree = buildTree(
+      0,
+      node.potentialMoves.length - 1,
+      node.potentialMoves
+    );
+    return tree;
+  }
+
+  function checkWinCondition(node) {
+    if (
+      node.currentSpace[0] === endArr[0] &&
+      node.currentSpace[1] === endArr[1]
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  const arr = startNode.potentialMoves;
+  let moveList = [];
+  const moveSequences = [];
+  for (let i = 0; i < arr.length; i++) {
+    const nodeN = node(arr[i]);
+    const nodeNTree = buildingTrees(nodeN);
+    moveList.push(nodeN);
+    const found = levelOrderRecursive(
+      (nodeA) => {
+        moveList.push(nodeA);
+        if (checkWinCondition(nodeA)) {
+          moveSequences.push(moveList);
+          moveList = [];
+          return true;
+        }
+        // const tree = buildingTrees(nodeA);
+      },
+      [nodeNTree]
+    );
+    if (found) {
+    }
+  }
+
+  console.log(
+    moveSequences[1].forEach((value) => {
+      console.log(value.currentSpace);
+    })
+  );
+
+  // const trees = buildingTrees(startNode);
+  // return trees;
 }
+
+console.log(knightMoves([0, 0], [3, 3]));
