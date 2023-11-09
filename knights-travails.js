@@ -130,38 +130,52 @@ function knightMoves(startArr, endArr) {
     }
   }
 
-  const arr = startNode.potentialMoves;
-  let moveList = [];
-  const moveSequences = [];
-  for (let i = 0; i < arr.length; i++) {
-    const nodeN = node(arr[i]);
-    const nodeNTree = buildingTrees(nodeN);
-    moveList.push(nodeN);
-    const found = levelOrderRecursive(
-      (nodeA) => {
-        moveList.push(nodeA);
-        if (checkWinCondition(nodeA)) {
-          moveSequences.push(moveList);
-          moveList = [];
-          return true;
-        }
-      },
-      [nodeNTree]
-    );
+  function generate(arr = startNode.potentialMoves) {
+    let moveList = [];
+    const moveSequences = [];
+    let found;
+    for (let i = 0; i < arr.length; i++) {
+      const nodeN = node(arr[i]);
+      const nodeNTree = buildingTrees(nodeN);
+      moveList.push(nodeN);
+      found = levelOrderRecursive(
+        (nodeA) => {
+          moveList.push(nodeA);
+          if (checkWinCondition(nodeA)) {
+            moveSequences.push(moveList);
+            moveList = [];
+            return true;
+          }
+        },
+        [nodeNTree]
+      );
+    }
+
+    if (found !== true) {
+    } else {
+      return { moveList, moveSequences, found };
+    }
   }
 
-  const sortedSeq = moveSequences.sort((a, b) => {
-    return a.length - b.length;
-  });
+  const results = generate();
+  console.log(results);
 
-  function buildMoveList() {
+  function tempSort(moveSequences = results.moveSequences) {
+    const sortedSeq = moveSequences.sort((a, b) => {
+      return a.length - b.length;
+    });
+    return sortedSeq;
+  }
+
+  function buildMoveList(moveList = results.moveList, sortedSeq = tempSort()) {
     moveList.push(startArr);
     sortedSeq[0].forEach((value) => {
       moveList.push(value.currentSpace);
     });
+    return moveList;
   }
 
-  function printResults() {
+  function printResults(moveList = buildMoveList()) {
     let str = `You made it in ${moveList.length - 1} moves! Here's your path:`;
     moveList.forEach((value) => {
       str = str.concat(`\n    [${value}]`);
@@ -169,7 +183,7 @@ function knightMoves(startArr, endArr) {
     return str;
   }
 
-  return;
+  return printResults();
 }
 
-console.log(knightMoves([0, 0], [3, 4]));
+console.log(knightMoves([0, 0], [3, 3]));
