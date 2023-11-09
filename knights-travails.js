@@ -145,7 +145,6 @@ function knightMoves(startArr, endArr) {
           moveList = [];
           return true;
         }
-        // const tree = buildingTrees(nodeA);
       },
       [nodeNTree]
     );
@@ -161,9 +160,6 @@ function knightMoves(startArr, endArr) {
   });
 
   console.log(moveList);
-
-  // const trees = buildingTrees(startNode);
-  // return trees;
 }
 
 console.log(knightMoves([0, 0], [3, 3]));
