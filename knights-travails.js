@@ -152,13 +152,32 @@ function knightMoves(startArr, endArr) {
     }
 
     if (found !== true) {
+      return { moveList, moveSequences: null, found: false };
     } else {
       return { moveList, moveSequences, found };
     }
   }
 
-  const results = generate();
-  console.log(results);
+  let results = generate();
+  // console.log(results);
+
+  function loopaLikeKingKoopa(res = results) {
+    if (res.found !== false) return;
+    for (let i = 0; i < res.moveList.length; i++) {
+      let tmp = res;
+      res = generate(res.moveList[i].potentialMoves);
+      if (res.moveList.length === 0) {
+        res = tmp;
+      }
+      if (res.found) return res;
+    }
+    console.log(res.moveList);
+    loopaLikeKingKoopa(res);
+  }
+
+  if (results.found === false) {
+    loopaLikeKingKoopa();
+  }
 
   function tempSort(moveSequences = results.moveSequences) {
     const sortedSeq = moveSequences.sort((a, b) => {
@@ -183,7 +202,7 @@ function knightMoves(startArr, endArr) {
     return str;
   }
 
-  return printResults();
+  // return printResults();
 }
 
-console.log(knightMoves([0, 0], [3, 3]));
+console.log(knightMoves([0, 0], [3, 4]));
