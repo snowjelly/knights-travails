@@ -133,7 +133,19 @@ function knightMoves(startArr, endArr = []) {
   return { start: [startX, startY], end: [endX, endY] };
 }
 
-function recurse(startingNode) {
+function findDupes(arrToSearch, sourceArr) {
+  const dupes = arrToSearch.every(
+    (value) => value[0] !== sourceArr[0] && value[1] !== sourceArr[1]
+  );
+  if (dupes) {
+    console.log({ dupes: false, arrToSearch });
+  } else {
+    console.log({ dupes: true, arrToSearch });
+  }
+  return !dupes;
+}
+
+function recurse(startingNode, arrToSearch = []) {
   const arr = levelOrderRecursive(null, [startingNode.potentialMoves]);
   for (let i = 0; i < arr.length; i++) {
     console.log({ startingNodeData: startingNode.data });
@@ -141,6 +153,9 @@ function recurse(startingNode) {
     //console.log(arr[i].data[0]);
     prettyPrintAlt(arr[i].potentialMoves.potentialMoves);
     console.log(arr[i].potentialMoves.potentialMoves.data[0]);
+    findDupes(arrToSearch, arr[i].potentialMoves.potentialMoves.data[0]);
+
+    arrToSearch.push(arr[i].potentialMoves.potentialMoves.data[0]);
     if (
       arr[i].potentialMoves.potentialMoves.data[0][0] ===
         startingNode.data[0] &&
@@ -148,7 +163,7 @@ function recurse(startingNode) {
     ) {
       throw new Error("pls return :/");
     }
-    recurse(arr[i].potentialMoves);
+    recurse(arr[i].potentialMoves, arrToSearch);
   }
 }
 
