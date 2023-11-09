@@ -159,7 +159,15 @@ function knightMoves(startArr, endArr) {
     moveList.push(value.currentSpace);
   });
 
-  console.log(moveList);
+  function printResults() {
+    let str = `You made it in ${moveList.length - 1} moves! Here's your path:`;
+    moveList.forEach((value) => {
+      str = str.concat(`\n    [${value}]`);
+    });
+    return str;
+  }
+
+  return printResults();
 }
 
 console.log(knightMoves([0, 0], [3, 3]));
