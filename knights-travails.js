@@ -107,7 +107,7 @@ function gameBoard() {
   return { board, potentialMoves: createPotentialMoves() };
 }
 
-function knightMoves(startArr, endArr) {
+function knightMoves(startArr, endArr, prevResult = null, prevStartArr = null) {
   const startNode = node(startArr);
 
   function buildingTrees(node) {
@@ -130,17 +130,28 @@ function knightMoves(startArr, endArr) {
     }
   }
 
+  // 0,0 2,1 4,2, 3,4
+
   function generate(arr = startNode.potentialMoves) {
     let moveList = [];
     const moveSequences = [];
     let found;
     for (let i = 0; i < arr.length; i++) {
       const nodeN = node(arr[i]);
+      if (checkWinCondition(nodeN)) {
+        moveList = [nodeN];
+        moveSequences.push(moveList);
+        found = true;
+        console.log("break reached");
+        break;
+      }
+
       const nodeNTree = buildingTrees(nodeN);
       moveList.push(nodeN);
+
       found = levelOrderRecursive(
         (nodeA) => {
-          moveList.push(nodeA);
+          moveList.push([nodeA]);
           if (checkWinCondition(nodeA)) {
             moveSequences.push(moveList);
             moveList = [];
@@ -152,57 +163,50 @@ function knightMoves(startArr, endArr) {
     }
 
     if (found !== true) {
-      return { moveList, moveSequences: null, found: false };
+      return { moveList, moveSequences, found: false, arr };
     } else {
       return { moveList, moveSequences, found };
     }
   }
 
   let results = generate();
-  // console.log(results);
+  if (!results.found && results.moveList) {
+    const currentSpace =
+      results.moveList.flat()[results.moveList.length - 1].currentSpace;
+    results.moveList;
+    console.log("fail", currentSpace);
+    console.log(results.arr);
 
-  function loopaLikeKingKoopa(res = results) {
-    if (res.found !== false) return;
-    for (let i = 0; i < res.moveList.length; i++) {
-      let tmp = res;
-      res = generate(res.moveList[i].potentialMoves);
-      if (res.moveList.length === 0) {
-        res = tmp;
-      }
-      if (res.found) return res;
+    const firstPotentialMoves = results.moveList.filter(
+      (value) => value.currentSpace
+    );
+
+    const test = firstPotentialMoves[firstPotentialMoves.length - 1];
+    console.log(test.currentSpace);
+    results.moveList.unshift(test.currentSpace);
+    knightMoves(currentSpace, endArr, results, startArr);
+  } else {
+    const newMoveList = [
+      prevStartArr,
+      prevResult.moveList[0],
+      prevResult.moveList[prevResult.moveList.length - 1][0].currentSpace,
+      results.moveList[0].currentSpace,
+    ];
+    console.log(newMoveList);
+
+    function printResults(moveList = newMoveList) {
+      let str = `You made it in ${
+        moveList.length - 1
+      } moves! Here's your path:`;
+      moveList.forEach((value) => {
+        str = str.concat(`\n    [${value}]`);
+      });
+      console.log(str);
+      return str;
     }
-    console.log(res.moveList);
-    loopaLikeKingKoopa(res);
-  }
 
-  if (results.found === false) {
-    loopaLikeKingKoopa();
+    return printResults();
   }
-
-  function tempSort(moveSequences = results.moveSequences) {
-    const sortedSeq = moveSequences.sort((a, b) => {
-      return a.length - b.length;
-    });
-    return sortedSeq;
-  }
-
-  function buildMoveList(moveList = results.moveList, sortedSeq = tempSort()) {
-    moveList.push(startArr);
-    sortedSeq[0].forEach((value) => {
-      moveList.push(value.currentSpace);
-    });
-    return moveList;
-  }
-
-  function printResults(moveList = buildMoveList()) {
-    let str = `You made it in ${moveList.length - 1} moves! Here's your path:`;
-    moveList.forEach((value) => {
-      str = str.concat(`\n    [${value}]`);
-    });
-    return str;
-  }
-
-  // return printResults();
 }
 
 console.log(knightMoves([0, 0], [3, 4]));
