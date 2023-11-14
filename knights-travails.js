@@ -39,18 +39,18 @@ const prettyPrintAlt = (node, prefix = "", isLeft = true) => {
   }
 };
 
-function buildTree(l, h, sortedArr) {
+function buildTree(l, h, sortedArr, rootSpace) {
   if (l > h) return null;
 
   const mid = Math.floor((l + h) / 2);
-  const nodeOb = node(sortedArr[mid]);
+  const nodeOb = node(sortedArr[mid], rootSpace);
 
-  nodeOb.left = buildTree(l, mid - 1, sortedArr);
-  nodeOb.right = buildTree(mid + 1, h, sortedArr);
+  nodeOb.left = buildTree(l, mid - 1, sortedArr, rootSpace);
+  nodeOb.right = buildTree(mid + 1, h, sortedArr, rootSpace);
   return nodeOb;
 }
 
-const node = (arr) => {
+const node = (arr, rootSpace = null) => {
   function getPotentialMoves(x = arr[0], y = arr[1]) {
     const arr = [];
 
@@ -80,6 +80,7 @@ const node = (arr) => {
   return {
     currentSpace: [arr[0], arr[1]],
     potentialMoves,
+    rootSpace,
   };
 };
 
@@ -101,20 +102,40 @@ function gameBoard() {
     board.forEach((space) => {
       boardsPotentialMoves.push(node(space));
     });
+
     return boardsPotentialMoves;
   }
 
-  return { board, potentialMoves: createPotentialMoves() };
+  function find(node) {
+    const boardsPotentialMoves = createPotentialMoves();
+    return boardsPotentialMoves.find(
+      (value) =>
+        value.currentSpace[0] === node[0] && value.currentSpace[1] === node[1]
+    );
+  }
+
+  return {
+    board,
+    potentialMoves: createPotentialMoves(),
+    find,
+  };
 }
 
-function knightMoves(startArr, endArr, prevResult = null, prevStartArr = null) {
-  const startNode = node(startArr);
+function find(node, searchArr) {
+  return searchArr.find(
+    (value) => value[0] === node[0] && value[1] === node[1]
+  );
+}
+
+function knightMoves(currentSpace, destination) {
+  const startNode = node(currentSpace);
 
   function buildingTrees(node) {
     const tree = buildTree(
       0,
       node.potentialMoves.length - 1,
-      node.potentialMoves
+      node.potentialMoves,
+      node
     );
     return tree;
   }
@@ -133,81 +154,28 @@ function knightMoves(startArr, endArr, prevResult = null, prevStartArr = null) {
   // 0,0 2,1 4,2, 3,4
 
   function generate(arr = startNode.potentialMoves) {
-    let moveList = [];
-    const moveSequences = [];
-    let found;
     for (let i = 0; i < arr.length; i++) {
-      const nodeN = node(arr[i]);
-      if (checkWinCondition(nodeN)) {
-        moveList = [nodeN];
-        moveSequences.push(moveList);
-        found = true;
-        console.log("break reached");
-        break;
-      }
-
-      const nodeNTree = buildingTrees(nodeN);
-      moveList.push(nodeN);
-
-      found = levelOrderRecursive(
-        (nodeA) => {
-          moveList.push([nodeA]);
-          if (checkWinCondition(nodeA)) {
-            moveSequences.push(moveList);
-            moveList = [];
-            return true;
-          }
-        },
-        [nodeNTree]
-      );
-    }
-
-    if (found !== true) {
-      return { moveList, moveSequences, found: false, arr };
-    } else {
-      return { moveList, moveSequences, found };
+      const nodeN = node(arr[i], arr[i]);
+      const treeN = buildingTrees(nodeN);
+      (() => {
+        console.log(treeN);
+      })();
     }
   }
 
-  let results = generate();
-  if (!results.found && results.moveList) {
-    const currentSpace =
-      results.moveList.flat()[results.moveList.length - 1].currentSpace;
-    results.moveList;
-    console.log("fail", currentSpace);
-    console.log(results.arr);
+  // console.log(gameBoard().find([7, 4]));
+  generate();
 
-    const firstPotentialMoves = results.moveList.filter(
-      (value) => value.currentSpace
-    );
-
-    const test = firstPotentialMoves[firstPotentialMoves.length - 1];
-    console.log(test.currentSpace);
-    results.moveList.unshift(test.currentSpace);
-    knightMoves(currentSpace, endArr, results, startArr);
-  } else {
-    console.log(prevResult);
-    const newMoveList = [
-      prevStartArr,
-      null,
-      prevResult.moveList[prevResult.moveList.length - 1][0].currentSpace,
-      results.moveList[0].currentSpace,
-    ];
-    console.log(newMoveList);
-
-    function printResults(moveList = newMoveList) {
-      let str = `You made it in ${
-        moveList.length - 1
-      } moves! Here's your path:`;
-      moveList.forEach((value) => {
-        str = str.concat(`\n    [${value}]`);
-      });
-      console.log(str);
-      return str;
-    }
-
-    return printResults();
+  function printResults(moveList) {
+    let str = `You made it in ${moveList.length - 1} moves! Here's your path:`;
+    moveList.forEach((value) => {
+      str = str.concat(`\n    [${value}]`);
+    });
+    console.log(str);
+    return str;
   }
+
+  return;
 }
 
 console.log(knightMoves([0, 0], [3, 7]));
