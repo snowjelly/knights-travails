@@ -186,9 +186,10 @@ function knightMoves(startArr, endArr, prevResult = null, prevStartArr = null) {
     results.moveList.unshift(test.currentSpace);
     knightMoves(currentSpace, endArr, results, startArr);
   } else {
+    console.log(prevResult);
     const newMoveList = [
       prevStartArr,
-      prevResult.moveList[0],
+      null,
       prevResult.moveList[prevResult.moveList.length - 1][0].currentSpace,
       results.moveList[0].currentSpace,
     ];
@@ -209,4 +210,4 @@ function knightMoves(startArr, endArr, prevResult = null, prevStartArr = null) {
   }
 }
 
-console.log(knightMoves([0, 0], [3, 4]));
+console.log(knightMoves([0, 0], [3, 7]));
