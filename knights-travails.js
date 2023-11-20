@@ -105,20 +105,48 @@ function gameBoard() {
     return boardsPotentialMoves;
   }
 
-  function find(node) {
-    const boardsPotentialMoves = createPotentialMoves();
-    return boardsPotentialMoves.find(
-      (value) =>
-        value.currentSpace[0] === node[0] && value.currentSpace[1] === node[1]
-    );
-  }
-
   return {
     board,
     potentialMoves: createPotentialMoves(),
-    find,
   };
 }
 
-const board = gameBoard().potentialMoves[0];
-console.log(board);
+const board = gameBoard().potentialMoves;
+
+function find(node, arrToSearch) {
+  if (!arrToSearch[0].currentSpace)
+    return arrToSearch.find(
+      (space) => space[0] === node[0] && space[1] === node[1]
+    );
+
+  return arrToSearch.find(
+    (space) =>
+      space.currentSpace[0] === node[0] && space.currentSpace[1] === node[1]
+  );
+}
+
+function findAnswer(node, answerToFind) {
+  const a = find([node[0], node[1]], board);
+
+  const result = find([answerToFind[0], answerToFind[1]], a.potentialMoves);
+
+  if (result !== undefined) return { found: true, result, answerToFind, node };
+  return { found: false, nextNodeArr: a.potentialMoves, answerToFind, node };
+}
+
+function driver() {
+  let found = findAnswer([0, 3], [2, 5]);
+  let totalLength = found.nextNodeArr.length;
+
+  if (!found.found) {
+    for (let i = 0; i < totalLength; i++) {
+      totalLength += found.nextNodeArr.length;
+      found = findAnswer(found.nextNodeArr[i], found.answerToFind);
+      i = 0;
+      console.log(found);
+      if (found.found) return found;
+    }
+  }
+}
+
+driver();
