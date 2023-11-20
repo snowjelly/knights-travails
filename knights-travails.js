@@ -50,27 +50,33 @@ function buildTree(l, h, sortedArr, rootSpace) {
   return nodeOb;
 }
 
-const node = (arr) => {
+const movesFr = [];
+
+const node = (arr, endArr) => {
   function getPotentialMoves(x = arr[0], y = arr[1]) {
     const arr = [];
 
-    arr.push([x + 2, y + 1]);
-    arr.push([x + 2, y - 1]);
-    arr.push([x - 2, y - 1]);
-    arr.push([x - 2, y + 1]);
+    arr.push({ currentSpace: [x, y], potentialMoves: [x + 2, y + 1] });
+    arr.push({ currentSpace: [x, y], potentialMoves: [x + 2, y - 1] });
+    arr.push({ currentSpace: [x, y], potentialMoves: [x - 2, y - 1] });
+    arr.push({ currentSpace: [x, y], potentialMoves: [x - 2, y + 1] });
 
-    arr.push([x + 1, y + 2]);
-    arr.push([x - 1, y + 2]);
-    arr.push([x - 1, y - 2]);
-    arr.push([x + 1, y - 2]);
+    arr.push({ currentSpace: [x, y], potentialMoves: [x + 1, y + 2] });
+    arr.push({ currentSpace: [x, y], potentialMoves: [x - 1, y + 2] });
+    arr.push({ currentSpace: [x, y], potentialMoves: [x - 1, y - 2] });
+    arr.push({ currentSpace: [x, y], potentialMoves: [x + 1, y - 2] });
     const legalMoves = arr.filter(
-      (move) => move[0] > 0 && move[0] <= 7 && move[1] > 0 && move[1] <= 7
+      (move) =>
+        move.potentialMoves[0] > 0 &&
+        move.potentialMoves[0] <= 7 &&
+        move.potentialMoves[1] > 0 &&
+        move.potentialMoves[1] <= 7
     );
     legalMoves.sort((a, b) => {
-      if (a[0] - b[0] === 0) {
-        return a[1] - b[1];
+      if (a.potentialMoves[0] - b.potentialMoves[0] === 0) {
+        return a.potentialMoves[1] - b.potentialMoves[1];
       }
-      return a[0] - b[0];
+      return a.potentialMoves[0] - b.potentialMoves[0];
     });
     return legalMoves;
   }
@@ -78,7 +84,6 @@ const node = (arr) => {
   const potentialMoves = getPotentialMoves();
 
   return {
-    currentSpace: [arr[0], arr[1]],
     potentialMoves,
   };
 };
@@ -110,8 +115,6 @@ function gameBoard() {
     potentialMoves: createPotentialMoves(),
   };
 }
-
-const board = gameBoard().potentialMoves;
 
 function find(node, arrToSearch) {
   if (!arrToSearch[0].currentSpace)
@@ -146,13 +149,15 @@ function driver() {
       console.log(found);
       if (found.found) return found;
     }
-    for (let i = 0; i < startArr.length; i++) {
-      let tmp = findAnswer(startArr[i], found.answerToFind);
-      console.log("------------------");
-      console.log(findAnswer(tmp.nextNodeArr[0], found.answerToFind));
-      if (found.found) return found;
-    }
   }
 }
 
-driver();
+const moves = [];
+
+function knightMoves(startArr, endArr) {
+  return node(startArr, endArr);
+}
+
+// can also filter out potential moves that have already been made ? (potentialy overcomplicating this)
+
+console.log(knightMoves([5, 5], [3, 3]).potentialMoves);
