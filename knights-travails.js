@@ -136,14 +136,20 @@ function findAnswer(node, answerToFind) {
 
 function driver() {
   let found = findAnswer([0, 3], [2, 5]);
-  let totalLength = found.nextNodeArr.length;
+  let copy = found;
+  const startArr = found.nextNodeArr;
+  console.log(found);
 
   if (!found.found) {
-    for (let i = 0; i < totalLength; i++) {
-      totalLength += found.nextNodeArr.length;
-      found = findAnswer(found.nextNodeArr[i], found.answerToFind);
-      i = 0;
+    for (let i = 0; i < startArr.length; i++) {
+      found = findAnswer(startArr[i], found.answerToFind);
       console.log(found);
+      if (found.found) return found;
+    }
+    for (let i = 0; i < startArr.length; i++) {
+      let tmp = findAnswer(startArr[i], found.answerToFind);
+      console.log("------------------");
+      console.log(findAnswer(tmp.nextNodeArr[0], found.answerToFind));
       if (found.found) return found;
     }
   }
