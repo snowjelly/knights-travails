@@ -178,13 +178,18 @@ function knightMoves(start, end) {
         ball[i].spacesTraveled = spacesTraveled;
         ball[i].numberOfMovesMade = spacesTraveled.length;
 
+        ball[i].potMoves.forEach((move) => {
+          placeKnight(move[0], move[1]);
+        });
+
         return ball[i];
       }
     }
   }
 
-  console.log(placeKnight());
-  console.log(placeKnight(1, 1));
+  const yes = placeKnight();
+
+  console.log(yes.spacesTraveled[yes.spacesTraveled.length - 1]);
 }
 
 knightMoves([0, 3], [3, 3]);
