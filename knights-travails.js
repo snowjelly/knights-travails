@@ -39,18 +39,16 @@ const prettyPrintAlt = (node, prefix = "", isLeft = true) => {
   }
 };
 
-function buildTree(l, h, sortedArr, rootSpace) {
+function buildTree(l, h, sortedArr) {
   if (l > h) return null;
 
   const mid = Math.floor((l + h) / 2);
-  const nodeOb = node(sortedArr[mid], rootSpace);
+  const nodeOb = { data: sortedArr[mid] };
 
-  nodeOb.left = buildTree(l, mid - 1, sortedArr, rootSpace);
-  nodeOb.right = buildTree(mid + 1, h, sortedArr, rootSpace);
+  nodeOb.left = buildTree(l, mid - 1, sortedArr);
+  nodeOb.right = buildTree(mid + 1, h, sortedArr);
   return nodeOb;
 }
-
-const movesFr = [];
 
 const node = (space, endArr = null) => {
   if (endArr !== null) {
@@ -86,7 +84,9 @@ const node = (space, endArr = null) => {
 
     const potMoves = legalMoves.map((move) => (move = move.potentialMoves));
 
-    return { bundledArray: { currentSpace: [x, y], potMoves } };
+    const tree = buildTree(0, [...potMoves].length - 1, [...potMoves]);
+
+    return { bundledArray: { currentSpace: [x, y], potMoves, tree } };
   }
 
   return setPotentialMoves();
@@ -123,6 +123,22 @@ function gameBoard() {
 }
 
 const ball = gameBoard().potentialMoves;
+
+function knightMoves(start, end) {
+  const startX = start[0];
+  const startY = start[1];
+  const endX = end[0];
+  const endY = end[1];
+
+  for (let i = 0; i < ball.length; i++) {
+    const selectedSpace = ball[i].currentSpace;
+    if (selectedSpace[0] === startX && selectedSpace[1] === startY) {
+      console.log(ball[i]);
+    }
+  }
+}
+
+knightMoves([0, 3], [3, 3]);
 
 // can also filter out potential moves that have already been made ? (potentialy overcomplicating this)
 
