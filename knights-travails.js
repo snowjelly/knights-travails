@@ -155,12 +155,19 @@ function knightMoves(start, end) {
 
         if (prevSpace !== undefined) {
           if (
-            !prevSpace.potMoves.find((space) => {
-              space[0] === newestSpace.currentSpace[0] &&
-                space[1] === newestSpace.currentSpace[1];
-            }) ||
-            (prevSpace.currentSpace[0] === newestSpace.currentSpace[0] &&
-              prevSpace.currentSpace[1] === newestSpace.currentSpace[1])
+            !prevSpace.potMoves.find(
+              (space) =>
+                space[0] === newestSpace.currentSpace[0] &&
+                space[1] === newestSpace.currentSpace[1]
+            )
+          ) {
+            spacesTraveled.pop();
+            return;
+          }
+
+          if (
+            prevSpace.currentSpace[0] === newestSpace.currentSpace[0] &&
+            prevSpace.currentSpace[1] === newestSpace.currentSpace[1]
           ) {
             spacesTraveled.pop();
             return;
@@ -168,6 +175,8 @@ function knightMoves(start, end) {
         }
 
         ball[i].knightTraveled = true;
+        ball[i].spacesTraveled = spacesTraveled;
+        ball[i].numberOfMovesMade = spacesTraveled.length;
 
         return ball[i];
       }
@@ -175,6 +184,7 @@ function knightMoves(start, end) {
   }
 
   console.log(placeKnight());
+  console.log(placeKnight(1, 1));
 }
 
 knightMoves([0, 3], [3, 3]);
