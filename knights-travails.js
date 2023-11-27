@@ -130,12 +130,52 @@ function knightMoves(start, end) {
   const endX = end[0];
   const endY = end[1];
 
-  for (let i = 0; i < ball.length; i++) {
-    const selectedSpace = ball[i].currentSpace;
-    if (selectedSpace[0] === startX && selectedSpace[1] === startY) {
-      console.log(ball[i]);
+  const spacesTraveled = [];
+
+  function placeKnight(x = startX, y = startY) {
+    for (let i = 0; i < ball.length; i++) {
+      const selectedSpace = ball[i].currentSpace;
+      if (selectedSpace[0] === x && selectedSpace[1] === y) {
+        // find duplicates
+        if (
+          spacesTraveled.find(
+            (space) =>
+              space.currentSpace[0] === ball[i].currentSpace[0] &&
+              space.currentSpace[1] === ball[i].currentSpace[1]
+          )
+        ) {
+          return;
+        }
+
+        spacesTraveled.push(ball[i]);
+
+        //must be valid move
+        const prevSpace = spacesTraveled[spacesTraveled.length - 2];
+        const newestSpace = spacesTraveled[spacesTraveled.length - 1];
+
+        if (prevSpace !== undefined) {
+          if (
+            !prevSpace.potMoves.find((space) => {
+              space[0] === newestSpace.currentSpace[0] &&
+                space[1] === newestSpace.currentSpace[1];
+            })
+          ) {
+            spacesTraveled.pop();
+            return;
+          }
+        }
+
+        ball[i].knightTraveled = true;
+
+        return ball[i];
+      }
     }
   }
+
+  console.log(placeKnight());
+  console.log(placeKnight(7, 7));
+  console.log(placeKnight(6, 7));
+  console.log(spacesTraveled);
 }
 
 knightMoves([0, 3], [3, 3]);
