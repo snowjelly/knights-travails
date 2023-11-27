@@ -158,7 +158,9 @@ function knightMoves(start, end) {
             !prevSpace.potMoves.find((space) => {
               space[0] === newestSpace.currentSpace[0] &&
                 space[1] === newestSpace.currentSpace[1];
-            })
+            }) ||
+            (prevSpace.currentSpace[0] === newestSpace.currentSpace[0] &&
+              prevSpace.currentSpace[1] === newestSpace.currentSpace[1])
           ) {
             spacesTraveled.pop();
             return;
@@ -173,9 +175,6 @@ function knightMoves(start, end) {
   }
 
   console.log(placeKnight());
-  console.log(placeKnight(7, 7));
-  console.log(placeKnight(6, 7));
-  console.log(spacesTraveled);
 }
 
 knightMoves([0, 3], [3, 3]);
