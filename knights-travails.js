@@ -52,8 +52,12 @@ function buildTree(l, h, sortedArr, rootSpace) {
 
 const movesFr = [];
 
-const node = (arr, endArr) => {
-  function getPotentialMoves(x = arr[0], y = arr[1]) {
+const node = (space, endArr = null) => {
+  if (endArr !== null) {
+    if (arr[0] === endArr[0] && arr[1] === endArr[1]) return;
+  }
+
+  function setPotentialMoves(x = space[0], y = space[1]) {
     const arr = [];
 
     arr.push({ currentSpace: [x, y], potentialMoves: [x + 2, y + 1] });
@@ -65,6 +69,7 @@ const node = (arr, endArr) => {
     arr.push({ currentSpace: [x, y], potentialMoves: [x - 1, y + 2] });
     arr.push({ currentSpace: [x, y], potentialMoves: [x - 1, y - 2] });
     arr.push({ currentSpace: [x, y], potentialMoves: [x + 1, y - 2] });
+
     const legalMoves = arr.filter(
       (move) =>
         move.potentialMoves[0] > 0 &&
@@ -78,14 +83,13 @@ const node = (arr, endArr) => {
       }
       return a.potentialMoves[0] - b.potentialMoves[0];
     });
-    return legalMoves;
+
+    const potMoves = legalMoves.map((move) => (move = move.potentialMoves));
+
+    return { bundledArray: { currentSpace: [x, y], potMoves } };
   }
 
-  const potentialMoves = getPotentialMoves();
-
-  return {
-    potentialMoves,
-  };
+  return setPotentialMoves();
 };
 
 function gameBoard() {
@@ -104,60 +108,53 @@ function gameBoard() {
   function createPotentialMoves() {
     const boardsPotentialMoves = [];
     board.forEach((space) => {
-      boardsPotentialMoves.push(node(space));
+      boardsPotentialMoves.push(node(space).bundledArray);
     });
 
     return boardsPotentialMoves;
   }
 
+  const potentialMoves = createPotentialMoves();
+
   return {
     board,
-    potentialMoves: createPotentialMoves(),
+    potentialMoves: potentialMoves,
   };
 }
 
-function find(node, arrToSearch) {
-  if (!arrToSearch[0].currentSpace)
-    return arrToSearch.find(
-      (space) => space[0] === node[0] && space[1] === node[1]
-    );
-
-  return arrToSearch.find(
-    (space) =>
-      space.currentSpace[0] === node[0] && space.currentSpace[1] === node[1]
-  );
-}
-
-function findAnswer(node, answerToFind) {
-  const a = find([node[0], node[1]], board);
-
-  const result = find([answerToFind[0], answerToFind[1]], a.potentialMoves);
-
-  if (result !== undefined) return { found: true, result, answerToFind, node };
-  return { found: false, nextNodeArr: a.potentialMoves, answerToFind, node };
-}
-
-function driver() {
-  let found = findAnswer([0, 3], [2, 5]);
-  let copy = found;
-  const startArr = found.nextNodeArr;
-  console.log(found);
-
-  if (!found.found) {
-    for (let i = 0; i < startArr.length; i++) {
-      found = findAnswer(startArr[i], found.answerToFind);
-      console.log(found);
-      if (found.found) return found;
-    }
-  }
-}
-
-const moves = [];
-
-function knightMoves(startArr, endArr) {
-  return node(startArr, endArr);
-}
+const ball = gameBoard().potentialMoves;
 
 // can also filter out potential moves that have already been made ? (potentialy overcomplicating this)
 
-console.log(knightMoves([5, 5], [3, 3]).potentialMoves);
+/*
+what if i had an index of every possible move and just appended the
+possible moves to each move
+mid ^
+i still dont know when to stop generating moves.
+because
+hm
+
+i need a structure that allows my search algo to come across every space
+before it starts fuccin looping
+like it cant just start looping
+i wish it could go fucking in order dawg
+
+like
+
+check this array for the answer
+isnt there?
+go one over and keep doing that
+like only go one level deep to find potential moves there
+then go to the next level.
+and so on until u find it
+
+gameboard
+children of each move has potential moves
+
+
+
+consider generating the dataset before traversing/reading from it.
+generate gameboard with potential moves
+edit each space and traverse to generate more potential moves.
+
+*/
