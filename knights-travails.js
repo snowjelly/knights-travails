@@ -124,6 +124,15 @@ function gameBoard() {
 
 const ball = gameBoard().potentialMoves;
 
+function findSpace(searchArr) {
+  const x = searchArr[0];
+  const y = searchArr[1];
+
+  return ball.find(
+    (space) => space.currentSpace[0] === x && space.currentSpace[1] === y
+  );
+}
+
 function knightMoves(start, end) {
   const startX = start[0];
   const startY = start[1];
@@ -131,6 +140,17 @@ function knightMoves(start, end) {
   const endY = end[1];
 
   const spacesTraveled = [];
+
+  function isInPotentialMoves(arrToSearch, value) {
+    if (
+      arrToSearch.potMoves.find(
+        (space) =>
+          space[0] === value.currentSpace[0] &&
+          space[1] === value.currentSpace[1]
+      )
+    )
+      return true;
+  }
 
   function placeKnight(x = startX, y = startY) {
     for (let i = 0; i < ball.length; i++) {
@@ -154,13 +174,7 @@ function knightMoves(start, end) {
         const newestSpace = spacesTraveled[spacesTraveled.length - 1];
 
         if (prevSpace !== undefined) {
-          if (
-            !prevSpace.potMoves.find(
-              (space) =>
-                space[0] === newestSpace.currentSpace[0] &&
-                space[1] === newestSpace.currentSpace[1]
-            )
-          ) {
+          if (!isInPotentialMoves(prevSpace, newestSpace)) {
             spacesTraveled.pop();
             return;
           }
@@ -175,8 +189,11 @@ function knightMoves(start, end) {
         }
 
         ball[i].knightTraveled = true;
-        ball[i].spacesTraveled = spacesTraveled;
         ball[i].numberOfMovesMade = spacesTraveled.length;
+
+        // push into array 6 times. tostring. split the array in half. if one half is the same as the other half. disable duplicate checking
+        // find a way to start from the beginning but ignoring every single potMov marked as "knightTraveled"
+        // can re-add checking in
 
         ball[i].potMoves.forEach((move) => {
           placeKnight(move[0], move[1]);
@@ -189,10 +206,23 @@ function knightMoves(start, end) {
 
   const yes = placeKnight();
 
-  console.log(yes.spacesTraveled[yes.spacesTraveled.length - 1]);
+  console.log(spacesTraveled[spacesTraveled.length - 1]);
+
+  spacesTraveled.forEach((space) => {
+    console.log({ cs: space.currentSpace, pm: space.potMoves });
+  });
+
+  const cube = ball.filter(
+    (space) =>
+      !space.knightTraveled && isInPotentialMoves(space, findSpace(start))
+  );
+
+  cube.forEach((move) => {
+    placeKnight(move.currentSpace[0], move.currentSpace[1]);
+  });
 }
 
-knightMoves([0, 3], [3, 3]);
+knightMoves([7, 7], [3, 3]);
 
 // can also filter out potential moves that have already been made ? (potentialy overcomplicating this)
 
