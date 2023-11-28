@@ -152,22 +152,22 @@ function knightMoves(start, end) {
       return true;
   }
 
-  function placeKnight(x = startX, y = startY) {
-    for (let i = 0; i < ball.length; i++) {
-      const selectedSpace = ball[i].currentSpace;
+  function placeKnight(x = startX, y = startY, board = ball) {
+    for (let i = 0; i < board.length; i++) {
+      const selectedSpace = board[i].currentSpace;
       if (selectedSpace[0] === x && selectedSpace[1] === y) {
         // find duplicates
         if (
           spacesTraveled.find(
             (space) =>
-              space.currentSpace[0] === ball[i].currentSpace[0] &&
-              space.currentSpace[1] === ball[i].currentSpace[1]
+              space.currentSpace[0] === board[i].currentSpace[0] &&
+              space.currentSpace[1] === board[i].currentSpace[1]
           )
         ) {
           return;
         }
 
-        spacesTraveled.push(ball[i]);
+        spacesTraveled.push(board[i]);
 
         //must be valid move
         const prevSpace = spacesTraveled[spacesTraveled.length - 2];
@@ -188,18 +188,18 @@ function knightMoves(start, end) {
           }
         }
 
-        ball[i].knightTraveled = true;
-        ball[i].numberOfMovesMade = spacesTraveled.length;
+        board[i].knightTraveled = true;
+        board[i].numberOfMovesMade = spacesTraveled.length;
 
         // push into array 6 times. tostring. split the array in half. if one half is the same as the other half. disable duplicate checking
         // find a way to start from the beginning but ignoring every single potMov marked as "knightTraveled"
         // can re-add checking in
 
-        ball[i].potMoves.forEach((move) => {
+        board[i].potMoves.forEach((move) => {
           placeKnight(move[0], move[1]);
         });
 
-        return ball[i];
+        return board[i];
       }
     }
   }
