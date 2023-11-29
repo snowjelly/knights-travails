@@ -245,19 +245,28 @@ function knightMoves(start, end) {
   );
 
   console.log(spacesTraveledArr[spacesTraveledArr.length - 1]);
-  const spacesBeforeEnd = findPrevNodeBeforeResult(end);
-  const test = spacesBeforeEnd
-    .filter((space) => space.knightTraveled)
-    .sort((a, b) => a.numberOfMovesMade - b.numberOfMovesMade);
-  const spaceBeforeEnd = test[0];
-  console.log(spaceBeforeEnd);
-  spacesTraveledArr.splice(
-    spacesTraveledArr.findIndex(
-      (value) =>
-        value.currentSpace[0] === spaceBeforeEnd.currentSpace[0] &&
-        value.currentSpace[1] === spaceBeforeEnd.currentSpace[1]
-    ) + 1
-  );
+
+  function spacesBeforeEndThatTheKnightReachedSortedBySoonest() {
+    const spacesBeforeEnd = findPrevNodeBeforeResult(end);
+    const test = spacesBeforeEnd
+      .filter((space) => space.knightTraveled)
+      .sort((a, b) => a.numberOfMovesMade - b.numberOfMovesMade);
+    const spaceBeforeEnd = test[0];
+    console.log(spaceBeforeEnd);
+
+    const newArr = spacesTraveledArr.slice(
+      spacesTraveledArr.findIndex(
+        (value) =>
+          value.currentSpace[0] === spaceBeforeEnd.currentSpace[0] &&
+          value.currentSpace[1] === spaceBeforeEnd.currentSpace[1]
+      ) + 1
+    );
+
+    console.log(newArr);
+  }
+
+  spacesBeforeEndThatTheKnightReachedSortedBySoonest();
+
   console.log(spacesTraveledArr[spacesTraveledArr.length - 1].potMoves);
 }
 
