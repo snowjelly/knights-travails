@@ -139,7 +139,7 @@ function knightMoves(start, end) {
   const endX = end[0];
   const endY = end[1];
 
-  const spacesTraveled = [];
+  const spacesTraveledArr = [];
 
   function isInPotentialMoves(arrToSearch, value) {
     if (
@@ -152,7 +152,35 @@ function knightMoves(start, end) {
       return true;
   }
 
-  function placeKnight(x = startX, y = startY, board = ball) {
+  function findPrevNodeBeforeResult(arr) {
+    const moves = [];
+    ball.forEach((space) => {
+      if (isInPotentialMoves(space, findSpace(arr))) {
+        moves.push(space);
+      }
+    });
+    return moves;
+  }
+
+  function placeSeveralKnight(arrMoves) {
+    // for (let i = 0; i < arrMoves.length; i++) {
+    //   console.log(findSpace(arrMoves[i]));
+    // }
+    for (let i = 0; i < arrMoves.length; i++) {
+      const placed = placeKnight(arrMoves[i][0], arrMoves[i][1]);
+      if (placed !== undefined) {
+        console.log(placed);
+        console.log(spacesTraveledArr[0]);
+      }
+    }
+  }
+
+  function placeKnight(
+    x = startX,
+    y = startY,
+    board = ball,
+    spacesTraveled = spacesTraveledArr
+  ) {
     for (let i = 0; i < board.length; i++) {
       const selectedSpace = board[i].currentSpace;
       if (selectedSpace[0] === x && selectedSpace[1] === y) {
@@ -190,39 +218,50 @@ function knightMoves(start, end) {
 
         board[i].knightTraveled = true;
         board[i].numberOfMovesMade = spacesTraveled.length;
+        if (selectedSpace[0] === endX && selectedSpace[1] === endY) {
+          return board[i];
+        }
+        const potentialMoves = board[i].potMoves;
+        if (isInPotentialMoves(board[i], findSpace(end))) {
+          placeKnight(board[i].currentSpace[0], board[i].currentSpace[1]);
+        }
+
+        placeSeveralKnight(potentialMoves);
+
+        // i can get the array of potential moves and place the knight in that order before recursing deeper into the "tree"
 
         // push into array 6 times. tostring. split the array in half. if one half is the same as the other half. disable duplicate checking
         // find a way to start from the beginning but ignoring every single potMov marked as "knightTraveled"
         // can re-add checking in
-
-        board[i].potMoves.forEach((move) => {
-          placeKnight(move[0], move[1]);
-        });
-
-        return board[i];
       }
     }
   }
 
   const yes = placeKnight();
 
-  console.log(spacesTraveled[spacesTraveled.length - 1]);
-
-  spacesTraveled.forEach((space) => {
-    console.log({ cs: space.currentSpace, pm: space.potMoves });
-  });
-
   const cube = ball.filter(
     (space) =>
       !space.knightTraveled && isInPotentialMoves(space, findSpace(start))
   );
 
-  cube.forEach((move) => {
-    placeKnight(move.currentSpace[0], move.currentSpace[1]);
-  });
+  console.log(spacesTraveledArr[spacesTraveledArr.length - 1]);
+  const spacesBeforeEnd = findPrevNodeBeforeResult(end);
+  const test = spacesBeforeEnd
+    .filter((space) => space.knightTraveled)
+    .sort((a, b) => a.numberOfMovesMade - b.numberOfMovesMade);
+  const spaceBeforeEnd = test[0];
+  console.log(spaceBeforeEnd);
+  spacesTraveledArr.splice(
+    spacesTraveledArr.findIndex(
+      (value) =>
+        value.currentSpace[0] === spaceBeforeEnd.currentSpace[0] &&
+        value.currentSpace[1] === spaceBeforeEnd.currentSpace[1]
+    ) + 1
+  );
+  console.log(spacesTraveledArr[spacesTraveledArr.length - 1].potMoves);
 }
 
-knightMoves([7, 7], [3, 3]);
+knightMoves([5, 4], [0, 0]);
 
 // can also filter out potential moves that have already been made ? (potentialy overcomplicating this)
 
