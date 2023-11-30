@@ -169,8 +169,8 @@ function knightMoves(start, end) {
     for (let i = 0; i < arrMoves.length; i++) {
       const placed = placeKnight(arrMoves[i][0], arrMoves[i][1]);
       if (placed !== undefined) {
-        console.log(placed);
-        console.log(spacesTraveledArr[0]);
+        // console.log(placed);
+        // console.log(spacesTraveledArr[0]);
       }
     }
   }
@@ -244,7 +244,7 @@ function knightMoves(start, end) {
       !space.knightTraveled && isInPotentialMoves(space, findSpace(start))
   );
 
-  console.log(spacesTraveledArr[spacesTraveledArr.length - 1]);
+  // console.log(spacesTraveledArr[spacesTraveledArr.length - 1]);
 
   function spacesBeforeEndThatTheKnightReachedSortedBySoonest() {
     const spacesBeforeEnd = findPrevNodeBeforeResult(end);
@@ -252,25 +252,27 @@ function knightMoves(start, end) {
       .filter((space) => space.knightTraveled)
       .sort((a, b) => a.numberOfMovesMade - b.numberOfMovesMade);
     const spaceBeforeEnd = test[0];
-    console.log(spaceBeforeEnd);
+    // console.log(spaceBeforeEnd);
 
-    const newArr = spacesTraveledArr.slice(
+    const index =
       spacesTraveledArr.findIndex(
         (value) =>
           value.currentSpace[0] === spaceBeforeEnd.currentSpace[0] &&
           value.currentSpace[1] === spaceBeforeEnd.currentSpace[1]
-      ) + 1
-    );
+      ) + 1;
 
-    console.log(newArr);
+    spacesTraveledArr.splice(index);
+    spacesTraveledArr.forEach((value) => {
+      console.log(value);
+    });
   }
 
   spacesBeforeEndThatTheKnightReachedSortedBySoonest();
 
-  console.log(spacesTraveledArr[spacesTraveledArr.length - 1].potMoves);
+  // console.log(spacesTraveledArr[spacesTraveledArr.length - 1].potMoves);
 }
 
-knightMoves([5, 4], [0, 0]);
+knightMoves([5, 4], [1, 7]);
 
 // can also filter out potential moves that have already been made ? (potentialy overcomplicating this)
 
