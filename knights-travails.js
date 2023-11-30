@@ -70,9 +70,9 @@ const node = (space, endArr = null) => {
 
     const legalMoves = arr.filter(
       (move) =>
-        move.potentialMoves[0] > 0 &&
+        move.potentialMoves[0] >= 0 &&
         move.potentialMoves[0] <= 7 &&
-        move.potentialMoves[1] > 0 &&
+        move.potentialMoves[1] >= 0 &&
         move.potentialMoves[1] <= 7
     );
     legalMoves.sort((a, b) => {
