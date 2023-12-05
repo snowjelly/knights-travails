@@ -122,6 +122,8 @@ function gameBoard() {
   };
 }
 
+let counter = 0;
+
 const ball = gameBoard().potentialMoves;
 
 function findSpace(searchArr) {
@@ -168,12 +170,15 @@ function knightMoves(start, end) {
     // }
     for (let i = 0; i < arrMoves.length; i++) {
       const placed = placeKnight(arrMoves[i][0], arrMoves[i][1]);
+      // console.log(arrMoves[i]);
       if (placed !== undefined) {
         // console.log(placed);
         // console.log(spacesTraveledArr[0]);
       }
     }
   }
+
+  const trashCan = [];
 
   function placeKnight(
     x = startX,
@@ -192,6 +197,15 @@ function knightMoves(start, end) {
               space.currentSpace[1] === board[i].currentSpace[1]
           )
         ) {
+          if (
+            !trashCan.find(
+              (value) =>
+                value[0] === board[i].currentSpace[0] &&
+                value[1] === board[i].currentSpace[1]
+            )
+          ) {
+            trashCan.push(board[i].currentSpace);
+          }
           return;
         }
 
@@ -223,12 +237,21 @@ function knightMoves(start, end) {
         }
         const potentialMoves = board[i].potMoves;
         if (isInPotentialMoves(board[i], findSpace(end))) {
+          console.log({ currentX: board[i].currentSpace[0] });
           placeKnight(board[i].currentSpace[0], board[i].currentSpace[1]);
         }
+
+        // console.log(potentialMoves);
+        // console.log(counter++);
+        // console.log(trashCan);
+        console.log({ iSee: ball[i] });
+        console.log(levelOrderRecursive(null, [ball[i].tree]));
 
         placeSeveralKnight(potentialMoves);
 
         // i can get the array of potential moves and place the knight in that order before recursing deeper into the "tree"
+        // idk how to make this happen. it seems to traveled not like that.
+        // i think its time to try out the trees
 
         // push into array 6 times. tostring. split the array in half. if one half is the same as the other half. disable duplicate checking
         // find a way to start from the beginning but ignoring every single potMov marked as "knightTraveled"
@@ -237,42 +260,66 @@ function knightMoves(start, end) {
     }
   }
 
-  const yes = placeKnight();
+  for (let i = 0; i < ball.length; i++) {
+    levelOrderRecursive(
+      (result) => {
+        console.log(result);
+      },
+      [ball[i].tree]
+    );
+  }
 
-  const cube = ball.filter(
-    (space) =>
-      !space.knightTraveled && isInPotentialMoves(space, findSpace(start))
-  );
+  // const yes = placeKnight();
+
+  // const cube = ball.filter((space) => !space.knightTraveled);
+
+  // ball.forEach((space) => {
+  //   cube.forEach((move) => {
+  //     if (isInPotentialMoves(space, move)) {
+  //       console.log({ space, move });
+  //     }
+  //   });
+  // });
 
   // console.log(spacesTraveledArr[spacesTraveledArr.length - 1]);
 
-  function spacesBeforeEndThatTheKnightReachedSortedBySoonest() {
-    const spacesBeforeEnd = findPrevNodeBeforeResult(end);
-    const test = spacesBeforeEnd
-      .filter((space) => space.knightTraveled)
-      .sort((a, b) => a.numberOfMovesMade - b.numberOfMovesMade);
-    const spaceBeforeEnd = test[0];
-    // console.log(spaceBeforeEnd);
+  // function spacesBeforeEndThatTheKnightReachedSortedBySoonest() {
+  //   const spacesBeforeEnd = findPrevNodeBeforeResult(end);
+  //   const traveledSpacesBeforeEnd = spacesBeforeEnd
+  //     .filter((space) => space.knightTraveled)
+  //     .sort((a, b) => a.numberOfMovesMade - b.numberOfMovesMade);
+  //   const spaceBeforeEnd = traveledSpacesBeforeEnd[0];
+  //   const missedSpacesBeforeEnd = spacesBeforeEnd.sort(
+  //     (a, b) => a.numberOfMovesMade - b.numberOfMovesMade
+  //   );
 
-    const index =
-      spacesTraveledArr.findIndex(
-        (value) =>
-          value.currentSpace[0] === spaceBeforeEnd.currentSpace[0] &&
-          value.currentSpace[1] === spaceBeforeEnd.currentSpace[1]
-      ) + 1;
+  //   missedSpacesBeforeEnd.forEach((value) => {
+  //     value.potMoves.forEach((potMove) => {
+  //       // console.log(findSpace(potMove));
+  //     });
+  //   });
 
-    spacesTraveledArr.splice(index);
-    spacesTraveledArr.forEach((value) => {
-      console.log(value);
-    });
-  }
+  //   // console.log(spaceBeforeEnd);
 
-  spacesBeforeEndThatTheKnightReachedSortedBySoonest();
+  //   const index =
+  //     spacesTraveledArr.findIndex(
+  //       (value) =>
+  //         value.currentSpace[0] === spaceBeforeEnd.currentSpace[0] &&
+  //         value.currentSpace[1] === spaceBeforeEnd.currentSpace[1]
+  //     ) + 1;
+
+  //   spacesTraveledArr.splice(index);
+  //   spacesTraveledArr.forEach((value) => {
+  // console.log(value);
+  // });
+  // }
+
+  // spacesBeforeEndThatTheKnightReachedSortedBySoonest();
 
   // console.log(spacesTraveledArr[spacesTraveledArr.length - 1].potMoves);
 }
 
-knightMoves([5, 4], [1, 7]);
+knightMoves([0, 0], [7, 7]);
 
 // can also filter out potential moves that have already been made ? (potentialy overcomplicating this)
 
