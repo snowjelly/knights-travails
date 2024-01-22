@@ -84,10 +84,6 @@ function knightsTravails([startX, startY], [endX, endY]) {
   while (queue.length !== 0) {
     let shifted = queue.shift();
 
-    if (storage.has("05")) {
-      console.log(storage.get("05"));
-    }
-
     const moveList = shifted.knightMoveList();
     distCounter++;
 
