@@ -3,7 +3,8 @@ const ChessSpace = (x, y) => {
   const yPos = y;
   let prev = null;
   let distance = 0;
-  const name = [xPos, yPos];
+  const name = `${xPos}${yPos}`;
+  const viewName = [xPos, yPos];
 
   const moveOffsets = [
     [1, 2],
@@ -32,14 +33,23 @@ const ChessSpace = (x, y) => {
     return arr;
   }
 
-  return { xPos, yPos, prev, knightMoves, name, knightMoveList, distance };
+  return {
+    xPos,
+    yPos,
+    prev,
+    knightMoves,
+    name,
+    viewName,
+    knightMoveList,
+    distance,
+  };
 };
 
 function travelHelper(dest) {
   let counter = 0;
   const moveOrderInReverse = [];
   while (dest.prev !== null) {
-    moveOrderInReverse.push(dest.prev.name);
+    moveOrderInReverse.push(dest.prev.viewName);
     counter += 1;
     dest.prev = dest.prev.prev;
   }
@@ -47,7 +57,7 @@ function travelHelper(dest) {
   for (let i = moveOrderInReverse.length - 1; i >= 0; i--) {
     console.log(moveOrderInReverse[i]);
   }
-  console.log(dest.name);
+  console.log(dest.viewName);
 }
 
 function knightsTravails([startX, startY], [endX, endY]) {
@@ -73,8 +83,9 @@ function knightsTravails([startX, startY], [endX, endY]) {
 
   while (queue.length !== 0) {
     let shifted = queue.shift();
-    if (storage.has(shifted.name) === true) {
-      shifted = queue.shift();
+
+    if (storage.has("05")) {
+      console.log(storage.get("05"));
     }
 
     const moveList = shifted.knightMoveList();
@@ -89,13 +100,14 @@ function knightsTravails([startX, startY], [endX, endY]) {
       moveList[i].distance = distCounter;
       moveList[i].prev = shifted;
       moveList[i].traveled = true;
-      if (moveList[i].xPos === endX && moveList[i].yPos === endY)
+      if (moveList[i].xPos === endX && moveList[i].yPos === endY) {
         return travelHelper(moveList[i]);
-      storage.set(moveList[i].name, [moveList[i].xPos, moveList[i].yPos]);
+      }
+      storage.set(moveList[i].name, moveList[i]);
       queue.push(moveList[i]);
     }
     if (storage.size === 64) break;
   }
 }
 
-knightsTravails([0, 4], [0, 5]);
+knightsTravails([0, 0], [7, 7]);
